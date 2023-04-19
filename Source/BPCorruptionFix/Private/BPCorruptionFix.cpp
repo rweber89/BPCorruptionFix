@@ -68,7 +68,7 @@ namespace
 		{
 			return false;
 		}
-		
+
 		const auto& BlueprintEditorModule = FModuleManager::LoadModuleChecked<FBlueprintEditorModule>("Kismet");
 		for( const auto& OpenEditor : BlueprintEditorModule.GetBlueprintEditors() )
 		{
@@ -92,33 +92,33 @@ namespace
 			{
 				return false;
 			}
-			
+
 			return SubobjectEditor->GetSelectedNodes().Num() == 1;
 		});
 	}
 }
 
-void FBPCorruptionFix::StartupModule()
+void FBPCorruptionFixModule::StartupModule()
 {
 	RegisterMenus();
 }
 
-void FBPCorruptionFix::ShutdownModule()
+void FBPCorruptionFixModule::ShutdownModule()
 {
 }
 
-void FBPCorruptionFix::RegisterMenus()
+void FBPCorruptionFixModule::RegisterMenus()
 {
 	FToolMenuOwnerScoped OwnerScoped(this);
 
 	UToolMenu* Menu = UToolMenus::Get()->ExtendMenu("Kismet.SubobjectEditorContextMenu");
 	FToolMenuSection& Section = Menu->AddSection("BPCorruptionFixctions", LOCTEXT("BPCorruptionFixActionsHeader", "BPCorruptionFix"));
-	
+
 	RegisterCopyAction( Section );
 	RegisterPasteAction( Section );
 }
 
-void FBPCorruptionFix::RegisterCopyAction(FToolMenuSection& Section)
+void FBPCorruptionFixModule::RegisterCopyAction(FToolMenuSection& Section)
 {
 	FToolUIAction Action;
 	Action.CanExecuteAction = FToolMenuCanExecuteAction::CreateLambda([&](const FToolMenuContext& InContext)
@@ -145,7 +145,7 @@ void FBPCorruptionFix::RegisterCopyAction(FToolMenuSection& Section)
 
 		return true;
 	});
-	
+
 	Action.ExecuteAction = FToolMenuExecuteAction::CreateLambda([&](const FToolMenuContext& InContext)
 	{
 		TSharedPtr<SSubobjectEditor> SubobjectEditor;
@@ -167,7 +167,7 @@ void FBPCorruptionFix::RegisterCopyAction(FToolMenuSection& Section)
 	});
 
 	Action.IsActionVisibleDelegate = GetIsVisibleLambda();
-	
+
 	FToolMenuEntry& Entry = Section.AddMenuEntry(
 		"CopyIntactProperties",
 		LOCTEXT( "CopyIntactLabel", "Copy Intact Subobject"),
@@ -177,7 +177,7 @@ void FBPCorruptionFix::RegisterCopyAction(FToolMenuSection& Section)
 		EUserInterfaceActionType::Button);
 }
 
-void FBPCorruptionFix::RegisterPasteAction(FToolMenuSection& Section)
+void FBPCorruptionFixModule::RegisterPasteAction(FToolMenuSection& Section)
 {
 	FToolUIAction Action;
 	Action.CanExecuteAction = FToolMenuCanExecuteAction::CreateLambda([&](const FToolMenuContext& InContext)
@@ -192,7 +192,7 @@ void FBPCorruptionFix::RegisterPasteAction(FToolMenuSection& Section)
 		{
 			return false;
 		}
-		
+
 		const auto Node = SubobjectEditor->GetSelectedNodes()[0];
 		const auto* TargetProperty = GetPropertyForNode( Node );
 		if( !TargetProperty )
@@ -220,7 +220,7 @@ void FBPCorruptionFix::RegisterPasteAction(FToolMenuSection& Section)
 
 		return true;
 	});
-	
+
 	Action.ExecuteAction = FToolMenuExecuteAction::CreateLambda([&](const FToolMenuContext& InContext)
 	{
 		TSharedPtr<SSubobjectEditor> SubobjectEditor;
@@ -242,7 +242,7 @@ void FBPCorruptionFix::RegisterPasteAction(FToolMenuSection& Section)
 	});
 
 	Action.IsActionVisibleDelegate = GetIsVisibleLambda();
-	
+
 	FToolMenuEntry& Entry = Section.AddMenuEntry(
 		"PasteIntactProperties",
 		LOCTEXT( "PasteIntactLabel", "Paste Intact Subobject"),
@@ -254,4 +254,4 @@ void FBPCorruptionFix::RegisterPasteAction(FToolMenuSection& Section)
 
 #undef LOCTEXT_NAMESPACE
 
-IMPLEMENT_MODULE( FBPCorruptionFix, BPCorruptionFix)
+IMPLEMENT_MODULE( FBPCorruptionFixModule, BPCorruptionFix)
